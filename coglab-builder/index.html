@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Experiment Builder</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <h1>Cognitive Psychology Experiment Builder</h1>
+
+    <!-- Section 1: Use Saved Experiment -->
+    <div class="grand-section">
+        <h2>Use Saved Experiment:</h2>
+        <select id="savedExperimentsDropdown" onchange="loadSavedExperiment(this.value)">
+            <option value="">-- Select an experiment --</option>
+        </select>
+    </div>
+
+    <!-- SECTION 2: Create or Update Experiment -->
+    <div class="grand-section">
+        <h2>Create new experiment / update saved experiment:</h2>
+
+        <div class="section">
+            <h3>1. Apparatus</h3>
+
+            <label>Monitor Width (cm): <input type="number" id="monitorWidth" placeholder="e.g., 52.7"></label>
+            <label>Monitor Height (cm): <input type="number" id="monitorHeight" placeholder="e.g., 29.6"></label>
+            <button onclick="startCreditCardCalibration()">Measure monitor size</button>
+
+            <label>Monitor Resolution Width (px): <input type="number" id="monitorResX"
+                    placeholder="e.g., 1920"></label>
+            <label>Monitor Resolution Height (px): <input type="number" id="monitorResY"
+                    placeholder="e.g., 1080"></label>
+            <button onclick="autoDetectResolution()">Auto-detect monitor resolution</button>
+
+            <label>Viewing Distance (cm): <input type="number" id="viewingDistance" placeholder="e.g., 60"></label>
+
+            <button onclick="setApparatus()">Set Apparatus</button>
+
+            <p id="visualAngleInfo" style="margin-top: 10px; font-style: italic;"></p>
+        </div>
+
+        <div class="section">
+            <h3>2. Stimuli</h3>
+            <label>Stimulus Type:
+                <select id="stimType" onchange="updateStimulusInput()">
+                    <option value="text">Text</option>
+                    <option value="polygon">Polygon</option>
+                    <option value="image">Image</option>
+                    <option value="audio">Audio</option>
+                </select>
+            </label>
+
+            <label>Stimulus Name: <input type="text" id="stimName" placeholder="e.g., RED_WORD"></label>
+
+            <div id="stimContentWrapper"></div>
+
+            <button id="addStimulusBtn" onclick="addStimulus()">Add Stimulus</button>
+            <button id="updateStimulusBtn" onclick="updateStimulus()" disabled>Update Stimulus</button>
+            <p><strong>List of stimuli:</strong></p>
+            <ul id="stimuliList"></ul>
+        </div>
+
+        <div class="section">
+            <h3>3. Procedure</h3>
+            <label>
+                Display Label:
+                <input type="text" id="displayName" placeholder="e.g., Fixation, Stimulus">
+            </label>
+            <label>
+                Duration (ms):
+                <input type="number" id="displayDuration" value="500">
+            </label>
+            <label>
+                <input type="checkbox" id="untilResponse" onchange="toggleDuration()">
+                Until response
+            </label>
+            <div>
+                <label>
+                    <strong>Included Stimuli:</strong>
+                </label>
+                <div id="displayStimCheckboxes"></div>
+            </div>
+            <div id="stimulusLocations"></div>
+
+            <label>Expected Response Key:</label>
+            <span id="responseKeyDisplay" data-key="">None</span>
+            <div id="responseKeyKeyboard"></div>
+
+            <button id="addDisplayBtn" onclick="addDisplay()">Add Display to Trial</button>
+            <button id="updateDisplayBtn" onclick="updateDisplay()" disabled
+                style="opacity: 0.5; cursor: not-allowed;">Update Display</button>
+
+            <p><strong>List of displays:</strong></p>
+            <ol id="procedureList"></ol>
+        </div>
+
+        <div class="section">
+            <h3>4. Design</h3>
+            <label>Trials per Block: <input type="number" id="trialsPerBlock" value="10"></label>
+            <label>Blocks per Session: <input type="number" id="blocksPerSession" value="3"></label>
+            <label>Inter-Trial Interval (ms): <input type="number" id="interTrialInterval" value="1000"></label>
+            <label>Message Between Blocks: <input type="text" id="blockMessage" value="Take a short break!"></label>
+
+            <label>Break Response Key:</label>
+            <span id="breakResponseKeyDisplay" data-key="">None</span>
+            <div id="breakResponseKeyKeyboard"></div>
+
+            <label>Break Duration (ms, leave empty if key is required):
+                <input type="number" id="breakDuration" placeholder="e.g., 3000" oninput="toggleBreakControls()">
+            </label>
+
+            <button onclick="updateDesign()">Set Design</button>
+            <p id="designSummary"></p>
+
+            <button onclick="clearCurrentExperiment()" style="margin-top: 15px; background-color: #fdd;">Clear
+                All</button>
+        </div>
+
+        <div class="section">
+            <h3>5. Run and Save Experiment</h3>
+            <label>Participant code:
+                <input type="text" id="participantCode" placeholder="e.g., P001">
+            </label>
+            <button onclick="runExperiment()">Run</button>
+            <button onclick="showSaveExperimentOverlay()">Save</button>
+        </div>
+    </div>
+
+    <!-- Hidden overlay to name the experiment -->
+    <div id="saveExperimentOverlay" class="overlay">
+        <div class="overlay-content">
+            <p>Name your experiment:</p>
+            <input type="text" id="experimentNameInput" placeholder="e.g., AttentionStudy01">
+            <br>
+            <button onclick="saveExperiment()">Save</button>
+            <button onclick="hideSaveExperimentOverlay()">Cancel</button>
+        </div>
+    </div>
+
+    <div id="fullscreenContainer" style="display: none;"></div>
+
+    <div id="cardOverlay">
+        <p>
+            Resize the image below so it matches your physical credit card.<br>
+            Use ↑↓ to scale height, ←→ to scale width. Then click <strong>Done</strong>.
+        </p>
+
+        <div id="cardSizer">
+            <img id="cardImage" src="assets/credit-card.png" alt="Credit Card">
+        </div>
+
+        <p id="cardInfo" style="margin-top: 10px; font-size: 14px; color: white"></p>
+
+        <button onclick="finishCreditCardCalibration()">Done</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
